@@ -1,0 +1,135 @@
+%This is nor for dummies, but for mere m0rtals
+%%This is a very basic article template.
+%%There is just one section and two subsections.
+%\documentclass{article}
+\documentclass[a4paper,11pt]{article}
+%\documentclass[letterpaper,11pt]{article}
+%\usepackage{sidecap}
+\usepackage[lofdepth,lotdepth]{subfig}
+\usepackage{ccicons}
+\usepackage{url}
+\usepackage{hyperref}
+\usepackage{breakurl}
+
+\usepackage{multicol}
+%\usepackage{times}
+\usepackage{charter}    % Charter
+\usepackage{courier}    % Courier, \texttt only
+\usepackage{float}      % floating graphics 
+\usepackage{graphicx}
+\usepackage{wrapfig}
+%\usepackage{hyperref}
+\usepackage{listings}
+\hypersetup{colorlinks=false}
+\hypersetup{
+    colorlinks,%
+    citecolor=black,%
+    filecolor=black,%
+    linkcolor=black,%
+    urlcolor=black,%
+    breaklinks=true,%
+}
+
+% Quite good monospace-font:
+\renewcommand{\ttdefault}{txtt}
+
+
+% box for Verbatim
+\usepackage{verbatim}
+\usepackage{framed}
+
+
+\usepackage[top=2cm, bottom=2cm, left=2cm, right=2cm]{geometry} 
+\usepackage{sectsty}
+\sectionfont{\Large}
+
+\usepackage{color}
+\usepackage{xcolor}
+
+\usepackage{pstricks}
+
+\usepackage{caption}
+\DeclareCaptionFont{white}{\color{white}}
+\DeclareCaptionFormat{listing}{\colorbox{gray}{\parbox{\textwidth}{#1#2#3}}}
+\captionsetup[lstlisting]{format=listing,labelfont=white,textfont=white}
+
+
+%\lstset{
+%numbers=left, 
+%stepnumber=1, 
+%frame=single, 
+%breaklines=true,
+%breakatwhitespace=false, 
+%frame=shadowbox, 
+%rulesepcolor=\color{black},
+%basicstyle = \ttfamily,
+%columns=fullflexible
+%}
+
+\lstset{
+         %basicstyle=\footnotesize\ttfamily, % Standardschrift
+         basicstyle=\small\ttfamily,
+         %basicstyle=\small\sffamily,
+         numbers=left,               % Ort der Zeilennummern
+         numberstyle=\tiny,          % Stil der Zeilennummern
+         %stepnumber=2,               % Abstand zwischen den Zeilennummern
+         numbersep=5pt,              % Abstand der Nummern zum Text
+         tabsize=2,                  % Groesse von Tabs
+         extendedchars=true,         %
+         breaklines=true,            % Zeilen werden Umgebrochen
+         breakatwhitespace=false,
+         keywordstyle=\color{red},
+                frame=b,
+ %        keywordstyle=[1]\textbf,    % Stil der Keywords
+ %        keywordstyle=[2]\textbf,    %
+ %        keywordstyle=[3]\textbf,    %
+ %        keywordstyle=[4]\textbf,   \sqrt{\sqrt{}} %
+         stringstyle=\color{white}\ttfamily, % Farbe der String
+         showspaces=false,           % Leerzeichen anzeigen ?
+         showtabs=false,             % Tabs anzeigen ?
+         xleftmargin=17pt,
+         framexleftmargin=17pt,
+         framexrightmargin=5pt,
+         framexbottommargin=4pt,
+         %backgroundcolor=\color{lightgray},
+         showstringspaces=false,      % Leerzeichen in Strings anzeigen ?        
+         frame=bottomline,
+%         escapeinside={(*@}{@*)}
+         escapeinside={(*->}{<-*)}
+ }
+
+\long\def\greybox#1{%
+    \newbox\contentbox%
+    \newbox\bkgdbox%
+    \setbox\contentbox\hbox to \hsize{%
+        \vtop{
+            \kern\columnsep
+            \hbox to \hsize{%
+                \kern\columnsep%
+                \advance\hsize by -2\columnsep%
+                \setlength{\textwidth}{\hsize}%
+                \vbox{
+                    \parskip=\baselineskip
+                    \parindent=0bp
+                    #1
+                }%
+                \kern\columnsep%
+            }%
+            \kern\columnsep%
+        }%
+    }%
+    \setbox\bkgdbox\vbox{
+        \pdfliteral{0.85 0.85 0.85 rg}
+        \hrule width  \wd\contentbox %
+               height \ht\contentbox %
+               depth  \dp\contentbox
+        \pdfliteral{0 0 0 rg}
+    }%
+    \wd\bkgdbox=0bp%
+    \vbox{\hbox to \hsize{\box\bkgdbox\box\contentbox}}%
+    \vskip\baselineskip%
+}
+
+%\newcommand{\ScriptsDir}{../../../../eldk-5-0-scripts}
+%\newcommand{\DenxDir}{../../../../eldk-5-0-denx}
+

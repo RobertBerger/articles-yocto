@@ -1,0 +1,263 @@
+\section*{Intro}
+
+\subsection*{Objectives}
+
+The goal of this paper is to make it as easy as possible (but not easier) to enter the beatiful world of Embedded GNU/Linux with the Yocto project~\cite{whatisyoctoproject-site}. Docker~\cite{whatisdocker-site} is used to minimize the "Works for me and I can't test your setup!" effect which could be a big stumbling stone for people who want to give Yocto a quick try. Another use-case would be for experienced users who need to have a defined build enviroment which they can pass around to others. In this paper we'll see how to build qemux86~\cite{qemu-site} images with Yocto Autobuilder~\cite{yocto-autobuilder-site} and how to run the results. Ideally you only need to install a working version of Docker on your preferred Linux distro and off you go. Please note that a fast machine (8 cores+) with big (1TB+) and fast discs (RAID0, SSD) and a speedy broadband connection will make your Yocto experience more pleasant.
+
+\subsection*{What is Docker?}
+
+This is how the official Docker site describes it~\cite{whatisdocker-site}:
+
+\greybox{
+Docker is an open platform for developers and sysadmins to build, ship, and run distributed applications. Consisting of Docker Engine, a portable, lightweight runtime and packaging tool, and Docker Hub, a cloud service for sharing applications and automating workflows, Docker enables apps to be quickly assembled from components and eliminates the friction between development, QA, and production environments. As a result, IT can ship faster and run the same app, unchanged, on laptops, data center VMs, and any cloud.}
+
+\pagebreak
+
+\subsection*{What is the Yocto Project?}
+This is how the official Yocto Project site describes it~\cite{whatisyoctoproject-site}:
+
+\greybox{
+The Yocto Project is an open source collaboration project that provides templates, tools and methods to help you create custom Linux-based systems for embedded products regardless of the hardware architecture. It was founded in 2010 as a collaboration among many hardware manufacturers, open-source operating systems vendors, and electronics companies to bring some order to the chaos of embedded Linux development.}
+
+\subsection*{What is Yocto Autobuilder?}
+This is how the official Yocto Project site describes it~\cite{yocto-autobuilder-site}:
+
+\greybox{
+AutoBuilder is a project to automate build tests and QA.
+
+One of the most neglected areas of open source development is testing and QA. A goal of The Yocto Project is to lead the industry in being the first open source project that targets embedded developers who
+
+\begin{itemize}
+  \item    publish their QA and testing plans,
+  \item     demonstrate their testing and QA in public,
+  \item     and develop tools to automate test and QA procedures for the benefit of everyone.
+\end{itemize}
+}
+
+\subsection*{What is QEMU?}
+This is how the official QEMU site describes it~\cite{qemu-site}:
+
+\greybox{
+QEMU is a generic and open source machine emulator and virtualizer.
+
+When used as a machine emulator, QEMU can run OSes and programs made for one machine (e.g. an ARM board) on a different machine (e.g. your own PC). By using dynamic translation, it achieves very good performance.
+
+When used as a virtualizer, QEMU achieves near native performances by executing the guest code directly on the host CPU. QEMU supports virtualization when executing under the Xen hypervisor or using the KVM kernel module in Linux. When using KVM, QEMU can virtualize x86, server and embedded PowerPC, and S390 guests. 
+}
+
+\pagebreak
+
+\section*{Install Docker and the Yocto Autobuilder Docker container}
+
+\subsection*{Install Docker}
+
+Just follow the instructions here~\cite{docker-install-site}. For the instructions which follow I assume the account/user you'll utilize with docker is member of the {\tt docker} group and a {\tt sudoer}. I use Docker version 1.1.1 on Ubuntu 12.04 and 14.04 64 bit machines. 
+
+\subsection*{Download the Yocto Autobuilder Docker container}
+
+\lstinputlisting[caption={docker pull the Yocto Autobuilder container}]{common/pull-yocto-autobuilder-1.sh}
+
+Depending on your broadband connection this might take some time. You should see something along those lines:
+
+\lstinputlisting[caption={docker pull the Yocto Autobuilder container - output}]{common/result-pull-yocto-autobuilder-1.sh}
+
+\subsection*{Script to run the Yocto Autobuilder Docker container}
+
+\lstinputlisting[caption={get script to run Yocto Autobuilder Docker container}]{common/get-yocto-autobuilder-docker-run-script-1.sh}
+
+\subsection*{Run the Yocto Autobuilder Docker container}
+
+Make sure you choose the right network interface for your computer. In my case it's {\tt br0}.
+
+\lstinputlisting[caption={run the Yocto Autobuilder Docker container}]{common/run-yocto-autobuilder-docker-1.sh}
+
+You will need to enter a few things as indicated below.
+
+\lstinputlisting[caption={run the Yocto Autobuilder Docker container - output},label={lst:result-run-yocto-autobuilder-docker-1}]{common/result-run-yocto-autobuilder-docker-1.sh}
+
+\begin{itemize}
+  \item In line \ref{USER_PASSWD} you need to enter the password of the account/user you'll utilize with docker.
+  \item Line \ref{SSH_ACCESS} suggests how to access the docker container via ssh and line \ref{WEB_ACCESS} how to access it via a web interface. (We'll see more about this later.)
+  \item In lines \ref{TIGHTVNC_PASSWD} and \ref{VERIFY_TIGHTVNC_PASSWD} enter {\tt genius}, since that's the password of the {\tt genius} user used inside the docker container
+  \item Line \ref{ROOT_PROMPT} is a root prompt inside the docker container, which we will not really utilize for now
+\end{itemize}
+
+\section*{Yocto Autobuilder}
+
+\subsection*{Preparation}
+
+Now you could connect to the web interface of the Yocto Autobuilder, but we'll create new qemux86 related jobs. To do so we'll connect, as suggested in listing~\ref{lst:result-run-yocto-autobuilder-docker-1} line~\ref{SSH_ACCESS}, via ssh to the docker container.
+
+\lstinputlisting[caption={connect via ssh to the docker container}]{common/ssh-connect-1.sh}
+
+Note that in ip adress and port will be different in your case. You should see somthing along those lines:
+
+\lstinputlisting[caption={connect via ssh to the docker container}]{common/result-ssh-connect-1.sh}
+
+\begin{itemize}
+  \item In lines \ref{GENIUS_PASS} enter {\tt genius} as a password
+  \item Line \ref{GENIUS_PROMPT} is the prompt of our {\tt genius} user which we'll use to work with our Yocto Autobuilder docker container
+\end{itemize}
+
+I already prepared some qemux86 sample jobs, which we'll add to Yocto Autobuilder.
+
+\lstinputlisting[caption={connect via ssh to the docker container}]{qemux86/qemux86-add-samples-1.sh}
+
+I open 3 shells in byobu (press F2). (With F3 and F4 you can navigate between the shells)
+
+\lstinputlisting[caption={byobu shell 0: monitor Yocto Autobuilder}]{qemux86/qemux86-monitor-autobuilder-1.sh}
+
+You should see something along those lines:
+
+\lstinputlisting[caption={byobu shell 0: monitor Yocto Autobuilder - output}]{qemux86/result-qemux86-monitor-autobuilder-1.sh}
+
+\lstinputlisting[caption={byobu shell 1: add new build jobs}]{qemux86/qemux86-update-build-jobs-1.sh}
+
+add to it at the beginning the new jobs, and it should looks like this:
+
+\lstinputlisting[caption={byobu shell 1: update yoctoAB.conf}]{qemux86/qemux86-update-build-jobs-2.sh}
+
+As you can see we added in line \ref{CORE_IMAGE_MINIMAL} instructions to build a {\tt core-image-minimal} image for a {\tt qemux86} machine utilizing {\tt daisy} and on line \ref{CORE_IMAGE_SATO_SDK} a {\tt core-image-sato-sdk} image for the same machine and Yocto distro version.
+
+\lstinputlisting[caption={custom-daisy-qemux86-core-image-minimal.conf}]{qemux86/custom-daisy-qemux86-core-image-minimal.conf}
+
+\lstinputlisting[caption={custom-daisy-qemux86-core-image-sato-sdk.conf}]{qemux86/custom-daisy-qemux86-core-image-sato-sdk.conf}
+
+\lstinputlisting[caption={byobu shell 2: restart Yocto-Autobuilder}]{qemux86/qemux86-restart-yocto-autobuilder-1.sh}
+
+\lstinputlisting[caption={byobu shell 2:  restart Yocto-Autobuilder - output}]{qemux86/result-qemux86-restart-yocto-autobuilder-1.sh}
+
+In line \ref{RESTART_AUTOBUILDER_PASSWD} enter {\tt genius} as a password and monitor what happened with autobuilder:
+
+\lstinputlisting[caption={byobu shell 0: monitor Yocto Autobuilder - output}]{qemux86/result-qemux86-monitor-autobuilder-2.sh}
+
+
+\pagebreak
+
+\subsection*{Build}
+
+\begin{itemize}
+  \item as suggested in listing~\ref{lst:result-run-yocto-autobuilder-docker-1} line~\ref{WEB_ACCESS} let's access the Yocto Autobuilder via a web browser. In my case I browse to {\tt http://192.168.44.253:49191/}
+  \item log in as you can see in figure~\ref{fig:login_to_yocto_autobuilder} (username: {\tt genius}/password: {\tt genius})
+  \item[]  
+       \begin{figure}[h!]
+         \centering
+         \includegraphics[width=0.9\textwidth]{figures/yocto-autobuilder-login.png}
+         \caption{login in to the Yocto Autobuilder {\tt genius/genius}}
+         \label{fig:login_to_yocto_autobuilder}
+        \end{figure}
+  \item click {Waterfall}
+  \item click {\tt custom-daisy-qemux86-core-image-minimal} as you can see in figure~\ref{fig:qemux86_additions}
+  \item[]
+       \begin{figure}[h!]
+         \centering
+         \includegraphics[width=0.8\textwidth]{figures/qemux86-yocto-autobuilder-1.png}
+         \caption{{\tt core-image-minimal} and {\tt core-image-sato-sdk} on the left}
+         \label{fig:qemux86_additions}
+       \end{figure}
+  \item click {\tt Force Build} as you can see in figure~\ref{fig:core_image_minimal_force_build}
+  \item[]
+       \begin{figure}[h!]
+         \centering
+           \includegraphics[width=0.5\textwidth]{figures/qemux86-yocto-autobuilder-core-image-minimal-force-build-1.png}
+           \caption{{\tt core-image-minimal} Force Build}
+           \label{fig:core_image_minimal_force_build}
+       \end{figure}
+  \item click {Waterfall}
+  \item click {\tt custom-daisy-qemux86-core-image-sato-sdk} as you can see in figure~\ref{fig:qemux86_additions}
+  \item click {\tt Force Build} as you can see in figure~\ref{fig:core_image_sato_sdk_force_build}
+  \item[]
+       \begin{figure}[h!]
+         \centering
+           \includegraphics[width=0.5\textwidth]{figures/qemux86-yocto-autobuilder-core-image-sato-sdk-force-build-1.png}
+           \caption{{\tt core-image-minimal} Force Build}
+           \label{fig:core_image_sato_sdk_force_build}
+       \end{figure}
+   \item initially you should see {\tt core-image-minimal} building and {\tt core-image-sato-sdk} pending as in figure~\ref{fig:core_image_minimal_dev_building}
+   \item[]
+       \begin{figure}[h!]
+         \centering
+           \includegraphics[height=0.4\textheight]{figures/qemux86-yocto-autobuilder-core-image-minimal-dev-building-1.png}
+           \caption{{\tt core-image-minimal} building, {\tt core-image-sato-sdk} pending}
+           \label{fig:core_image_minimal_dev_building}
+       \end{figure}
+   \item if everything went well you should see something like in figure~\ref{fig:core_image_minimal_and_sato_sdk_building}
+   \item[]
+       \begin{figure}[h!]
+         \centering
+           \includegraphics[height=0.4\textheight]{figures/qemux86-yocto-autobuilder-core-image-minimal-and-sato-sdk-building-1.png}
+           \caption{{\tt core-image-minimal} and {\tt core-image-sato-sdk} built}
+           \label{fig:core_image_minimal_and_sato_sdk_building}
+       \end{figure}
+   \item Note this took for me {\tt 1 hrs, 37 mins, 42 secs} + {\tt 3 hrs, 40 mins, 57 secs}
+\end{itemize}
+
+\subsection*{Run}
+
+\begin{itemize}
+  \item to make sure X-forwarding works start an xterm from a byobu shell
+\end{itemize}
+
+\lstinputlisting[caption={byobu shell 2:  start xterm}]{common/start-xterm-1.sh}
+
+\lstinputlisting[caption={xterm: run qemux86 for core-image-minimal}]{qemux86/run-qemux86-core-image-minimal-1.sh}
+
+\lstinputlisting[caption={xterm: run qemux86 for core-image-minimal - output}]{qemux86/result-run-qemux86-core-image-minimal-1.sh}
+
+\pagebreak
+
+\begin{itemize}
+  \item QEMU should pop up as you can see in figure~\ref{fig:qemux86_core_image_minimal}
+  \item If QEMU resizes just press the full screen button twice and you will see yocto booting
+  \item[]
+       \begin{figure}[h!]
+         \centering
+           \includegraphics[width=0.8\textwidth]{figures/qemux86-core-image-minimal-1.png}
+           \caption{run {\tt core-image-minimal}}
+           \label{fig:qemux86_core_image_minimal}
+       \end{figure}
+  \item Now you can login to your qemux86 as a {\tt root} user - no password
+  \item if you want your mouse from QEMU back in Linux press CTRL+ALT
+  \item issue {\tt halt} to power down your qemux86
+  \item I leave it as an exercise of the reader to run {\tt core-image-sato-sdk}, figure~\ref{fig:qemux86_core_image_sato_sdk} is how it should look like.
+  \item[]
+       \begin{figure}[h!]
+         \centering
+           \includegraphics[width=0.5\textwidth]{figures/qemux86-core-image-sato-sdk-1.png}
+           \caption{run {\tt core-image-sato-sdk}}
+           \label{fig:qemux86_core_image_sato_sdk}
+       \end{figure}
+\end{itemize}
+
+\subsection*{Snapshot}
+
+In order not to loose all the files which we downloaded/built up to know it would be a good idea to make a {\tt docker commit}. The {\tt id} we need to commit the currenty running docker container can be seen e.g. in the shell prompt of one of the ssh sessions we opened to the container. In listing~\ref{lst:docker-commit-1} you can see that the {\tt id} is {\tt b5dfaa13e484}.
+
+\lstinputlisting[label={lst:docker-commit-1}, caption={byobu shell 2: docker id}]{common/docker-commit-1.sh}
+
+\lstinputlisting[caption={shell on docker host: check available docker images}]{common/docker-commit-2.sh}
+
+\lstinputlisting[caption={shell on docker host: check available docker images - output}]{common/result-docker-commit-2.sh}
+
+\lstinputlisting[caption={shell on docker host: commit changes}]{common/docker-commit-3.sh}
+
+\lstinputlisting[label={lst:docker-commit-4}, caption={shell on docker host: check available docker images}]{common/docker-commit-4.sh}
+
+As you can see in listing~\ref{lst:docker-commit-4} we consumed {\tt 91.61 GB}, which means you need enough space on your disc and also that it will take quite some time to create the snapshot.
+
+\subsection*{Exit}
+
+You can now exit from the docker container as you see in figure~\ref{lst:exit-1} and next time start up the snapshot.
+
+\lstinputlisting[label={lst:exit-1}, caption={docker container root shell: exit}]{common/exit-1.sh}
+
+\lstinputlisting[caption={docker container root shell: exit - output}]{common/result-exit-1.sh}
+
+\subsection*{Start snapshot}
+
+\lstinputlisting[caption={docker host shell: start up snapshot}]{common/start-snapshot-1.sh}
+
+Please note that the {\tt ssh} and {\tt http} ports change every time you restart the docker container (because that's how I want it for now).
+
+\greybox{If you like this you might want to check out out training offers!}
+
